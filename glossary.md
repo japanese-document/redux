@@ -1,11 +1,6 @@
----
-id: glossary
-title: Glossary
----
+# 用語
 
-# Glossary
-
-This is a glossary of the core terms in Redux, along with their type signatures. The types are documented using [Flow notation](https://flowtype.org/docs/quick-reference.html).
+ここではReduxでよく使われる用語をその型と併せて説明します。その型は[Flowの表記](https://flowtype.org/docs/quick-reference.html)を使って説明します。
 
 ## State
 
@@ -13,9 +8,9 @@ This is a glossary of the core terms in Redux, along with their type signatures.
 type State = any
 ```
 
-_State_ (also called the _state tree_) is a broad term, but in the Redux API it usually refers to the single state value that is managed by the store and returned by [`getState()`](api/Store.md#getState). It represents the entire state of a Redux application, which is often a deeply nested object.
+_State_ (別名 _state tree_ )はいろいろな意味を持ちます。通常、Redux APIでは、Storeによって管理され、[`getState()`](https://redux.js.org/api/store#getstate)で返される単独の状態を意味します。 それはReduxを使ったアプリケーション全体の状態を表します。多くの場合、その状態は複雑なObjectです。
 
-By convention, the top-level state is an object or some other key-value collection like a Map, but technically it can be any type. Still, you should do your best to keep the state serializable. Don't put anything inside it that you can't easily turn into JSON.
+慣習ではState自体はObjectやMapのようなkey-value collectionであることが多いですが、技術的には任意の型で問題ありません。それでも、Stateをシリアライズできるようにするべきです。簡単にJSONに変換できない物はStateの中に入れないようにしてください。
 
 ## Action
 
@@ -23,13 +18,13 @@ By convention, the top-level state is an object or some other key-value collecti
 type Action = Object
 ```
 
-An _action_ is a plain object that represents an intention to change the state. Actions are the only way to get data into the store. Any data, whether from UI events, network callbacks, or other sources such as WebSockets needs to eventually be dispatched as actions.
+_Action_ はStateを変更する注文を表す素のObjectです。ActionはデータをStoreに渡す唯一の方法です。つまり、UIイベントやネットワークコールバックやWebSocketのような他のソースからのデータは最終的にActionとしてdispatchする必要があります。
 
-Actions must have a `type` field that indicates the type of action being performed. Types can be defined as constants and imported from another module. It's better to use strings for `type` than [Symbols](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Symbol) because strings are serializable.
+Actionにそれの種類を示す`type`フィールドを設定する必要があります。`type`フィールドの値は定数として定義したり、他のモジュールからimportすることができます。`type`フィールドの値は[Symbols](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Symbol)より文字列の方が適しています。なぜなら、シリアライズできるからです。
 
-Other than `type`, the structure of an action object is really up to you. If you're interested, check out [Flux Standard Action](https://github.com/acdlite/flux-standard-action) for recommendations on how actions should be constructed.
+`type`フィールド以外のActionオブジェクトの構造は特に決まっていません。それに興味がある場合は、[Flux Standard Action](https://github.com/acdlite/flux-standard-action)が参考になると思います。
 
-See also [async action](#async-action) below.
+以下の[Async Action](#async-action)も見ましょう。
 
 ## Reducer
 
@@ -37,15 +32,17 @@ See also [async action](#async-action) below.
 type Reducer<S, A> = (state: S, action: A) => S
 ```
 
-A _reducer_ (also called a _reducing function_) is a function that accepts an accumulation and a value and returns a new accumulation. They are used to reduce a collection of values down to a single value.
+_reducer_ (別名 _reducing function_) は累算結果と値を受け取って、新しい累算結果を返す関数です。 これはコレクションの値を1つの値に畳み込むために使われます。
 
-Reducers are not unique to Redux—they are a fundamental concept in functional programming. Even most non-functional languages, like JavaScript, have a built-in API for reducing. In JavaScript, it's [`Array.prototype.reduce()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce).
+ReducerはReduxだけの概念ではありません。関数型プログラミングの基本的な概念です。JavaScriptのようなほとんど関数型言語でない言語でも、reduceするためのAPIを備えています。JavaScriptのそれは[`Array.prototype.reduce()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce)です。
 
-In Redux, the accumulated value is the state object, and the values being accumulated are actions. Reducers calculate a new state given the previous state and an action. They must be _pure functions_—functions that return the exact same output for given inputs. They should also be free of side-effects. This is what enables exciting features like hot reloading and time travel.
+Reduxでは累算結果はStateオブジェクトです。そして、累算される値はActionです。Reducerは既存のStateとActionを受け取って新しいStateを算出します。Reducerは _純粋関数(Pure Function)_ である必要があります。つまり、同じ入力に対して完全に同じ出力を返す必要があります。
 
-Reducers are the most important concept in Redux.
+hot reloadingやtime travelのような素晴らしい機能を動作させるために、Reducerは副作用(side-effects)を含んでいてはいけません。
 
-_Do not put API calls into reducers._
+ReducerはReduxの最も重要なコンセプトです。
+
+_API呼び出しをReducerに入れないでください。_
 
 ## Dispatching Function
 
@@ -54,13 +51,13 @@ type BaseDispatch = (a: Action) => Action
 type Dispatch = (a: Action | AsyncAction) => any
 ```
 
-A _dispatching function_ (or simply _dispatch function_) is a function that accepts an action or an [async action](#async-action); it then may or may not dispatch one or more actions to the store.
+_Dispatching Function_ (または、simply dispatch function )は、1つのActionもしくは1つの[Async Action](#async-action)を受け取る関数です。この関数は1つのActionもStoreへdispatchしない場合と1つまたは複数のActionをStoreへdispatchする場合があります。
 
-We must distinguish between dispatching functions in general and the base [`dispatch`](api/Store.md#dispatchaction) function provided by the store instance without any middleware.
+一般的なDispatching FunctionとStoreインスタンスのMiddlewareを通さないBase [`Dispatch`](https://redux.js.org/api/Store#dispatchaction) Functionは異なります。
 
-The base dispatch function _always_ synchronously sends an action to the store's reducer, along with the previous state returned by the store, to calculate a new state. It expects actions to be plain objects ready to be consumed by the reducer.
+Base Dispatch Functionは常に同期的なActionをStoreのReducerへ送ります。そのActionとReducerと既存のStoreのStateを使って、新しいStateを算出します。このActionは素のObjectにReducer用の値をセットした物です。
 
-[Middleware](#middleware) wraps the base dispatch function. It allows the dispatch function to handle [async actions](#async-action) in addition to actions. Middleware may transform, delay, ignore, or otherwise interpret actions or async actions before passing them to the next middleware. See below for more information.
+[Middleware](#middleware)はBase Dispatch Functionをラップします。これによって、dispatch関数はActionに加えて[Async Action](#async-action)を取り扱うことが可能になります。(Dispatching Functionになる。)MiddlewareはActionとAsync Actionを次のMiddlewareに渡す前に、それらを変換したり、遅延したり、無視したり、それ以外の処理を加える場合があります。詳しい説明は以下にあります。
 
 ## Action Creator
 
@@ -68,11 +65,9 @@ The base dispatch function _always_ synchronously sends an action to the store's
 type ActionCreator<A, P extends any[] = any[]> = (...args: P) => Action | AsyncAction
 ```
 
-An _action creator_ is, quite simply, a function that creates an action. Do not confuse the two terms—again, an action is a payload of information, and an action creator is a factory that creates an action.
+_Action Creator_ は端的に言うとActionを生成する関数です。もう一度言いますが、ActionはReducerへ送信されるデータ本体でAction CreaterはActionを生成する関数です。この2つを混同しないように注意してください。Action Creatorを実行するとActionが生成されるだけで、Actionはdispatchされません。Stateを変更したい場合は、Storeの [`dispatch`](https://redux.js.org/api/Store#dispatchaction)関数を実行する必要があります。Actionを生成して、それを特定のStoreインスタンスにdispatchするAction Creatorを _Bound Action Creator_ と呼びます。
 
-Calling an action creator only produces an action, but does not dispatch it. You need to call the store's [`dispatch`](api/Store.md#dispatchaction) function to actually cause the mutation. Sometimes we say _bound action creators_ to mean functions that call an action creator and immediately dispatch its result to a specific store instance.
-
-If an action creator needs to read the current state, perform an API call, or cause a side effect, like a routing transition, it should return an [async action](#async-action) instead of an action.
+Action Creatorが現在のStateを読み込んだり、APIを読み込んだり、RouterのTransitionのような副作用を発生させる必要がある場合は、Actionの代わりに[Async Action](#async-action)を返す必要があります。
 
 ## Async Action
 
@@ -80,7 +75,7 @@ If an action creator needs to read the current state, perform an API call, or ca
 type AsyncAction = any
 ```
 
-An _async action_ is a value that is sent to a dispatching function, but is not yet ready for consumption by the reducer. It will be transformed by [middleware](#middleware) into an action (or a series of actions) before being sent to the base [`dispatch()`](api/Store.md#dispatchaction) function. Async actions may have different types, depending on the middleware you use. They are often asynchronous primitives, like a Promise or a thunk, which are not passed to the reducer immediately, but trigger action dispatches once an operation has completed.
+_Async Action_ はDispatching Functionに渡される値ですが、そのままではReducerで処理することができません。Async ActionはBase [`Dispatch`](https://redux.js.org/api/Store#dispatchaction) Functionに渡される前に、[Middleware](#middleware)で1つまたは複数のActionに変換されます。Async Actionは適用するMiddlewareごとに型が異なります。たいてい、Async Actionは、Promiseやthunkのような非同期処理を実行するものです。Async ActionはReducerにそのまま渡されません。Middlewareで、それらの処理が完了した後、Actionがdispatchされます。
 
 ## Middleware
 
@@ -89,11 +84,10 @@ type MiddlewareAPI = { dispatch: Dispatch, getState: () => State }
 type Middleware = (api: MiddlewareAPI) => (next: Dispatch) => Dispatch
 ```
 
-A middleware is a higher-order function that composes a [dispatch function](#dispatching-function) to return a new dispatch function. It often turns [async actions](#async-action) into actions.
+MiddlewareはDispatching Functionを関数合成して新しい[Dispatching Function](#dispatching-function)を返す高階関数(higher-order function)です。たいてい、それは [Async Action](#async-action)をActionに変換します。
 
-Middleware is composable using function composition. It is useful for logging actions, performing side effects like routing, or turning an asynchronous API call into a series of synchronous actions.
-
-See [`applyMiddleware(...middlewares)`](./api/applyMiddleware.md) for a detailed look at middleware.
+Middlewareは関数合成(function composition)で生成されます。
+これはログを出力やRoutingのような副作用の実行や非同期のAPIの呼び出しに対応するMiddlewareを合成することで、それぞれを(非同期の)Actionに変換する1つのMiddlewareにすることを可能にします。詳しくは[`applyMiddleware(...middlewares)`](https://redux.js.org/api/applyMiddleware)を見てください。
 
 ## Store
 
@@ -106,39 +100,48 @@ type Store = {
 }
 ```
 
-A store is an object that holds the application's state tree.
-There should only be a single store in a Redux app, as the composition happens on the reducer level.
+Storeはアプリケーションのstate treeを保存するオブジェクトです。そのstate treeはReducerで構成されます。Reduxを使っているアプリケーションではStoreは1つのみ存在してるべきです。
 
-- [`dispatch(action)`](api/Store.md#dispatchaction) is the base dispatch function described above.
-- [`getState()`](api/Store.md#getState) returns the current state of the store.
-- [`subscribe(listener)`](api/Store.md#subscribelistener) registers a function to be called on state changes.
-- [`replaceReducer(nextReducer)`](api/Store.md#replacereducernextreducer) can be used to implement hot reloading and code splitting. Most likely you won't use it.
+- [`dispatch(action)`](https://redux.js.org/api/Store#dispatchaction)は上記のBase Dispatch Functionです。
+- [`getState()`](https://redux.js.org/api/Store#getState)はStoreの現在のStateを返します。
+- [`subscribe(listener)`](https://redux.js.org/api/Store#subscribelistener)Stateが変化したときに実行される関数を登録します。
+- [`replaceReducer(nextReducer)`](https://redux.js.org/api/Store#replacereducernextreducer)はhot reloadingやcode splittingの実装に使うことができます。これを使うことはほとんどないと思います。
 
-See the complete [store API reference](api/Store.md#dispatchaction) for more details.
+詳しく知りたい場合は[Store APIリファレンス](api/Store.md#dispatchaction)を見てください。
 
-## Store creator
+## Store Creator
 
 ```js
 type StoreCreator = (reducer: Reducer, preloadedState: ?State) => Store
 ```
 
-A store creator is a function that creates a Redux store. Like with dispatching function, we must distinguish the base store creator, [`createStore(reducer, preloadedState)`](api/createStore.md) exported from the Redux package, from store creators that are returned from the store enhancers.
+Store CreatorはStoreを生成する関数です。Dispatching Functionのように、Base Store Creator(Reduxパッケージからexportされる[`createStore(reducer, preloadedState)`](https://redux.js.org/api/createStore))とStore Enhancerで生成されるStore Creatorを区別する必要があります。
 
-## Store enhancer
+## Store Enhancer
 
 ```js
 type StoreEnhancer = (next: StoreCreator) => StoreCreator
 ```
 
-A store enhancer is a higher-order function that composes a store creator to return a new enhanced store creator. This is similar to middleware in that it allows you to alter the store interface in a composable way.
+Store EnhancerはStore Creatorを関数合成して新しい改良されたStore Creatorを返す高階関数です。これはStoreとのやり取りを関数合成で変更できることがMiddlewareと似ています。
 
-Store enhancers are much the same concept as higher-order components in React, which are also occasionally called “component enhancers”.
+Store EnhancerはReactの[higher-order components](https://reactjs.org/docs/higher-order-components.html)とほとんど同じコンセプトです。だから、“component enhancers”と呼ばれることもあります。
 
-Because a store is not an instance, but rather a plain-object collection of functions, copies can be easily created and modified without mutating the original store. There is an example in [`compose`](api/compose.md) documentation demonstrating that.
+Storeは(何らかのクラスの)インスタンスではなく関数を素のObjectにまとめたものなので、簡単に複製することができます。そして、元のStoreを変更することなく改善することができます。
+[`compose`](https://redux.js.org/api/compose)のドキュメントにこの例があります。
 
-Most likely you'll never write a store enhancer, but you may use the one provided by the [developer tools](https://github.com/reduxjs/redux-devtools). It is what makes time travel possible without the app being aware it is happening. Amusingly, the [Redux middleware implementation](api/applyMiddleware.md) is itself a store enhancer.
+たいてい、Store Enhancerを書くことはありませんが、[developer tools](https://github.com/reduxjs/redux-devtools)で提供されているStore Enhancerを使うことはあるかもしれません。それはアプリケーションに影響を与えずにtime travelを可能にします。面白いことに、[Redux middlewareの実装](https://redux.js.org/api/applyMiddleware)はそれ自体がStore Enhancerです。
+
 
 ## License
+
+### Japanese part
+
+Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)
+
+Copyright (c) 2021 38elements
+
+### Other
 
 The MIT License (MIT)
 
