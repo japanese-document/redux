@@ -107,7 +107,7 @@ Storeはアプリケーションのstate treeを保存するオブジェクト�
 - [`subscribe(listener)`](https://redux.js.org/api/Store#subscribelistener)Stateが変化したときに実行される関数を登録します。
 - [`replaceReducer(nextReducer)`](https://redux.js.org/api/Store#replacereducernextreducer)はhot reloadingやcode splittingの実装に使うことができます。これを使うことはほとんどないと思います。
 
-詳しく知りたい場合は[Store APIリファレンス](api/Store.md#dispatchaction)を見てください。
+詳しく知りたい場合は[Store APIリファレンス](https://redux.js.org/api/store#dispatchaction)を見てください。
 
 ## Store Creator
 
