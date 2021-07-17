@@ -1,6 +1,6 @@
 # bindActionCreators(actionCreators, dispatch)
 
-[action creators](https://japanese-document.github.io/redux/glossary.html#action-creator)を値として持つObjectを引数としてとります。そのObjectの値であるaction craetorをaction creatorを実行して戻り値(action)を[`dispatch`](https://redux.js.org/api/Store#dispatchaction)の引数として実行する関数(dispatch(actionCreator(args)))に置き換えます。(Objectのキーはそのまま)
+[action creator](https://japanese-document.github.io/redux/glossary.html#action-creator)を値として持つObjectを引数としてとります。そのObjectの値であるaction craetorをaction creatorを実行して戻り値(action)を[`dispatch`](https://redux.js.org/api/Store#dispatchaction)の引数として実行する関数(dispatch(actionCreator(args)))に置き換えます。(Objectのキーはそのまま)
 
 
 (actionを適用する場合、)通常、直接[`Store`](https://redux.js.org/api/Store)の[`dispatch`](https://redux.js.org/api/Store#dispatchaction)関数を実行する必要があります。ReduxをReactと連携させる場合、[react-redux](https://github.com/gaearon/react-redux)が`dispatch`関数を提供するので、(dispatch関数を)直に実行することができます。
