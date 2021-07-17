@@ -1,22 +1,24 @@
-# `bindActionCreators(actionCreators, dispatch)`
+# bindActionCreators(actionCreators, dispatch)
 
-Turns an object whose values are [action creators](../understanding/thinking-in-redux/Glossary.md#action-creator), into an object with the same keys, but with every action creator wrapped into a [`dispatch`](Store.md#dispatchaction) call so they may be invoked directly.
+[action creators](https://japanese-document.github.io/redux/glossary.html#action-creator)を値として持つObjectを引数としてとります。そのObjectの値であるaction craetorをaction creatorを実行して戻り値(action)を[`dispatch`](https://redux.js.org/api/Store#dispatchaction)の引数として実行する関数(dispatch(actionCreator(args)))に置き換えます。(Objectのキーはそのまま)
 
-Normally you should just call [`dispatch`](Store.md#dispatchaction) directly on your [`Store`](Store.md) instance. If you use Redux with React, [react-redux](https://github.com/gaearon/react-redux) will provide you with the [`dispatch`](Store.md#dispatchaction) function so you can call it directly, too.
 
-The only use case for `bindActionCreators` is when you want to pass some action creators down to a component that isn't aware of Redux, and you don't want to pass [`dispatch`](Store.md#dispatchaction) or the Redux store to it.
+(actionを適用する場合、)通常、直接[`Store`](https://redux.js.org/api/Store)の[`dispatch`](https://redux.js.org/api/Store#dispatchaction)関数を実行する必要があります。ReduxをReactと連携させる場合、[react-redux](https://github.com/gaearon/react-redux)が`dispatch`関数を提供するので、(dispatch関数を)直に実行することができます。
 
-For convenience, you can also pass an action creator as the first argument, and get a dispatch wrapped function in return.
+唯一の`bindActionCreators`のユーズケースは`dispatch`やReduxのStoreをコンポーネントに渡すことなく、Reduxを意識せずコンポーネントにaction creatorを渡したい場合です。
+
+第1引数にaction creatorを渡すと、それをdispatchでラップした関数(dispatch(actionCreator(args)))を返します。
 
 #### Parameters
 
-1. `actionCreators` (_Function_ or _Object_): An [action creator](../understanding/thinking-in-redux/Glossary.md#action-creator), or an object whose values are action creators.
+1. `actionCreators` (_Function_ or _Object_): action creatorもしくはaction creatorを値に持つObject
 
-2. `dispatch` (_Function_): A [`dispatch`](Store.md#dispatchaction) function available on the [`Store`](Store.md) instance.
+2. `dispatch` (_Function_): `Store`の[`dispatch`](https://redux.js.org/api/Store#dispatchaction)関数
 
 #### Returns
 
-(_Function_ or _Object_): An object mimicking the original object, but with each function immediately dispatching the action returned by the corresponding action creator. If you passed a function as `actionCreators`, the return value will also be a single function.
+(_Function_ or _Object_): 第1引数にObjectが渡された場合、そのObjectの値をラップしてObjectの値の実行結果であるactionを第2引数のdispatchに渡して実行する関数(dispatch(actionCreator(args)))に置き換えて返します。第1引数に関数が渡された場合、同様に関数をラップして返します。
+
 
 #### Example
 
@@ -58,10 +60,8 @@ class TodoListContainer extends Component {
 
     const { dispatch } = props
 
-    // Here's a good use case for bindActionCreators:
-    // You want a child component to be completely unaware of Redux.
-    // We create bound versions of these functions now so we can
-    // pass them down to our child later.
+    // 以下はbindActionCreatorsの使用例です。
+    // 子コンポーネントにReduxを完全に意識させたくない場合、action creatorをdispatchにbindして子コンポーネントに渡します。
 
     this.boundActionCreators = bindActionCreators(TodoActionCreators, dispatch)
     console.log(this.boundActionCreators)
@@ -72,29 +72,28 @@ class TodoListContainer extends Component {
   }
 
   componentDidMount() {
-    // Injected by react-redux:
+    // react-reduxよる注入
     let { dispatch } = this.props
 
-    // Note: this won't work:
+    // 注意: これは動作しません。
     // TodoActionCreators.addTodo('Use Redux')
 
-    // You're just calling a function that creates an action.
-    // You must dispatch the action, too!
+    // 単にaction createrを実行しているだけです。
+    // actionをdispatchする必要があります。
 
-    // This will work:
+    // これは動作します。
     let action = TodoActionCreators.addTodo('Use Redux')
     dispatch(action)
   }
 
   render() {
-    // Injected by react-redux:
+    // react-reduxよる注入
     let { todos } = this.props
 
     return <TodoList todos={todos} {...this.boundActionCreators} />
 
-    // An alternative to bindActionCreators is to pass
-    // just the dispatch function down, but then your child component
-    // needs to import action creators and know about them.
+    // bindActionCreatorsを使う代わりにdispatch関数を子コンポーネントに渡す方法があります。
+    // しかし、子コンポーネントはaction creatorをimportして、それを意識する必要があります。
 
     // return <TodoList todos={todos} dispatch={dispatch} />
   }
@@ -104,6 +103,12 @@ export default connect(state => ({ todos: state.todos }))(TodoListContainer)
 ```
 
 ## License
+
+### Japanese part
+
+Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)
+
+Copyright (c) 2021 38elements
 
 ### Other
 
