@@ -1,58 +1,51 @@
 # `combineReducers(reducers)`
 
-As your app grows more complex, you'll want to split your [reducing function](../understanding/thinking-in-redux/Glossary.md#reducer) into separate functions, each managing independent parts of the [state](../understanding/thinking-in-redux/Glossary.md#state).
+アプリケーションが複雑になって、[reducing function](https://japanese-document.github.io/redux/glossary.html#reducer)を[state](https://japanese-document.github.io/redux/glossary.html#state)のキーごとに関数に分割したいとします。
 
-The `combineReducers` helper function turns an object whose values are different reducing functions into a single reducing function you can pass to [`createStore`](createStore.md).
+`combineReducers`関数はobjectが持つ複数のreducing functionを[`createStore`](https://redux.js.org/api/createstore)へ渡すことができる1つの関数に変換します。
 
-The resulting reducer calls every child reducer, and gathers their results into a single state object.
-**The state produced by `combineReducers()` namespaces the states of each reducer under their keys as passed to `combineReducers()`**
+`combineReducers`関数の戻り値のreducerは各子reducerを実行して、その結果を1つのstate objectにまとめます。**`combineReducers()`が生成するreducerが生成するstateは、`combineReducers()`に渡されたobjectのkeyをkeyにします。そして、objectの各keyに格納されているreducerの結果をそのkeyの値にします。**
 
-Example:
+例:
 
 ```js
 rootReducer = combineReducers({potato: potatoReducer, tomato: tomatoReducer})
-// This would produce the following state object
+// rootReducerは以下のstate objectを生成します。
 {
   potato: {
-    // ... potatoes, and other state managed by the potatoReducer ...
+    // ... potatoReducerが生成したstate
   },
   tomato: {
-    // ... tomatoes, and other state managed by the tomatoReducer, maybe some nice sauce? ...
+    // ... tomatoReducerが生成したstate
   }
 }
 ```
 
-You can control state key names by using different keys for the reducers in the passed object. For example, you may call `combineReducers({ todos: myTodosReducer, counter: myCounterReducer })` for the state shape to be `{ todos, counter }`.
+`combineReducers()`に渡すobjectのkey名を指定することで、stateのkey名を指定することができます。例として、`combineReducers({ todos: myTodosReducer, counter: myCounterReducer })`を実行した場合、stateを形状は`{ todos, counter }`になります。
 
-A popular convention is to name reducers after the state slices they manage, so you can use ES6 property shorthand notation: `combineReducers({ counter, todos })`. This is equivalent to writing `combineReducers({ counter: counter, todos: todos })`.
-
-> ##### A Note for Flux Users
->
-> This function helps you organize your reducers to manage their own slices of state, similar to how you would have different Flux Stores to manage different state. With Redux, there is just one store, but `combineReducers` helps you keep the same logical division between reducers.
+A popular convention is to name reducers after the state slices they manage, so you can use ES6 property shorthand notation:
+一般的に、reducerの関数名はそれが管理するstateの該当部分の名前にします。そうすると、[ES 2015のshorthand記法](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/Object_initializer#new_notations_in_ecmascript_2015)を使って次のように記述することができます。
+`combineReducers({ counter, todos })`。これは`combineReducers({ counter: counter, todos: todos })`と等価です。
 
 #### Arguments
 
-1. `reducers` (_Object_): An object whose values correspond to different reducing functions that need to be combined into one. See the notes below for some rules every passed reducer must follow.
-
-> Earlier documentation suggested the use of the ES6 `import * as reducers` syntax to obtain the reducers object. This was the source of a lot of confusion, which is why we now recommend exporting a single reducer obtained using `combineReducers()` from `reducers/index.js` instead. An example is included below.
+1. `reducers` (_Object_): 複数のreducing functionを持つobjectです。reducing functionは`combineReducers()`によって1つにまとめられます。objectに格納されるreducing functionの注意点が以下にあります。
 
 #### Returns
 
-(_Function_): A reducer that invokes every reducer inside the `reducers` object, and constructs a state object with the same shape.
+(_Function_): 引数の`reducers` objectに格納されているすべてのreducerを実行するreducerで、`reducers` objectと同じ形状のstate objectを生成するreducer
 
-#### Notes
+#### 注意点
 
-This function is mildly opinionated and is skewed towards helping beginners avoid common pitfalls. This is why it attempts to enforce some rules that you don't have to follow if you write the root reducer manually.
+`combineReducers`に渡されるreducerは以下のルールを満たす必要があります。
 
-Any reducer passed to `combineReducers` must satisfy these rules:
+- reducerの対象外のactionの場合、reducerの第1引数のstateを返す必要があります。
 
-- For any action that is not recognized, it must return the `state` given to it as the first argument.
+- `undefined`を返してはいけません。単なる`return`文で間違えることはよくあることです。reducerが`undefined`を返した場合、errorをthrowします。
 
-- It must never return `undefined`. It is too easy to do this by mistake via an early `return` statement, so `combineReducers` throws if you do that instead of letting the error manifest itself somewhere else.
+- reducerの第1引数の`state`の値が`undefined`である場合、reducerはinital stateを返す必要があります。前述のルールに従うとinitial stateは`undefined`ではない必要があります。[ES 2015のデフォルト引数](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Functions/Default_parameters)を使うことをお勧めしますが、明示的に第1引数が`undefined`か確認することもできます。
 
-- If the `state` given to it is `undefined`, it must return the initial state for this specific reducer. According to the previous rule, the initial state must not be `undefined` either. It is handy to specify it with ES6 optional arguments syntax, but you can also explicitly check the first argument for being `undefined`.
-
-While `combineReducers` attempts to check that your reducers conform to some of these rules, you should remember them, and do your best to follow them. `combineReducers` will check your reducers by passing `undefined` to them; this is done even if you specify initial state to `Redux.createStore(combineReducers(...), initialState)`. Therefore, you **must** ensure your reducers work properly when receiving `undefined` as state, even if you never intend for them to actually receive `undefined` in your own code.
+`combineReducers`はこれらのルールの一部に関して渡されたreducerが適合しているか確認しますが、これらを覚えて、それに従うようにしてください。`combineReducers`は渡されたreducerにundefinedを渡して確認します。これはinitial stateを`Redux.createStore(combineReducers(...), initialState)`のように指定した場合でも行われます。だから、必ず、意図せずreducerの第1引数のstateが`undefined`になった場合でも、正常に動作するようにreducerを実装してください。
 
 #### Example
 
@@ -121,13 +114,15 @@ console.log(store.getState())
 // }
 ```
 
-#### Tips
-
-- This helper is just a convenience! You can write your own `combineReducers` that [works differently](https://github.com/acdlite/reduce-reducers), or even assemble the state object from the child reducers manually and write a root reducing function explicitly, like you would write any other function.
-
-- You may call `combineReducers` at any level of the reducer hierarchy. It doesn't have to happen at the top. In fact you may use it again to split the child reducers that get too complicated into independent grandchildren, and so on.
-
 ## License
+
+### Japanese part
+
+Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)
+
+Copyright (c) 2021 38elements
+
+### Other
 
 The MIT License (MIT)
 
