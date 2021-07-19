@@ -5,7 +5,7 @@
 
 (actionを適用する場合、)通常、直接[`Store`](https://redux.js.org/api/Store)の[`dispatch`](https://redux.js.org/api/Store#dispatchaction)関数を実行する必要があります。ReduxをReactと連携させる場合、[react-redux](https://github.com/gaearon/react-redux)が`dispatch`関数を提供するので、(dispatch関数を)直に実行することができます。
 
-唯一の`bindActionCreators`のユーズケースは`dispatch`やReduxのStoreをコンポーネントに渡すことなく、Reduxを意識せずコンポーネントにaction creatorを渡したい場合です。
+唯一の`bindActionCreators`の使用例は`dispatch`やReduxのStoreをコンポーネントに渡すことなく、Reduxを意識せずコンポーネントにaction creatorを渡したい場合です。
 
 第1引数にaction creatorを渡すと、それをdispatchでラップした関数(dispatch(actionCreator(args)))を返します。
 
