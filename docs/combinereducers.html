@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>combineReducers(reducers) | redux</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="combineReducers(reducers)" />
+<meta property="og:locale" content="ja" />
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/82270353?s=400&v=4" />
+<link rel="canonical" href="https://japanese-document.github.io/redux/combinereducers.html" />
+<meta property="og:url" content="https://japanese-document.github.io/redux/combinereducers.html" />
+<meta property="og:site_name" content="redux" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="combineReducers(reducers)" />
+<script type="application/ld+json">
+{"headline":"combineReducers(reducers)","url":"https://japanese-document.github.io/redux/combinereducers.html","@type":"WebPage","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/redux/assets/css/style.css?v=d288bf3357e8879206d8997fd37eb0e12bdf7545">
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      <h1 id="combinereducersreducers"><code class="language-plaintext highlighter-rouge">combineReducers(reducers)</code></h1>
+
+<p>アプリケーションが複雑になって、<a href="https://japanese-document.github.io/redux/glossary.html#reducer">reducing function</a>を<a href="https://japanese-document.github.io/redux/glossary.html#state">state</a>のキーごとに関数に分割したいとします。</p>
+
+<p><code class="language-plaintext highlighter-rouge">combineReducers</code>関数はobjectが持つ複数のreducing functionを<a href="https://redux.js.org/api/createstore"><code class="language-plaintext highlighter-rouge">createStore</code></a>へ渡すことができる1つの関数に変換します。</p>
+
+<p><code class="language-plaintext highlighter-rouge">combineReducers</code>関数の戻り値のreducerは各子reducerを実行して、その結果を1つのstate objectにまとめます。<strong><code class="language-plaintext highlighter-rouge">combineReducers()</code>が生成するreducerが生成するstateは、<code class="language-plaintext highlighter-rouge">combineReducers()</code>に渡されたobjectのkeyをkeyにします。そして、objectの各keyに格納されているreducerの結果をそのkeyの値にします。</strong></p>
+
+<p>例:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">rootReducer</span> <span class="o">=</span> <span class="nx">combineReducers</span><span class="p">({</span><span class="na">potato</span><span class="p">:</span> <span class="nx">potatoReducer</span><span class="p">,</span> <span class="na">tomato</span><span class="p">:</span> <span class="nx">tomatoReducer</span><span class="p">})</span>
+<span class="c1">// rootReducerは以下のstate objectを生成します。</span>
+<span class="p">{</span>
+  <span class="nl">potato</span><span class="p">:</span> <span class="p">{</span>
+    <span class="c1">// ... potatoReducerが生成したstate</span>
+  <span class="p">},</span>
+  <span class="nx">tomato</span><span class="p">:</span> <span class="p">{</span>
+    <span class="c1">// ... tomatoReducerが生成したstate</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">combineReducers()</code>に渡すobjectのkey名を指定することで、stateのkey名を指定することができます。例として、<code class="language-plaintext highlighter-rouge">combineReducers({ todos: myTodosReducer, counter: myCounterReducer })</code>を実行した場合、stateを形状は<code class="language-plaintext highlighter-rouge">{ todos, counter }</code>になります。</p>
+
+<p>A popular convention is to name reducers after the state slices they manage, so you can use ES6 property shorthand notation:
+一般的に、reducerの関数名はそれが管理するstateの該当部分の名前にします。そうすると、<a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/Object_initializer#new_notations_in_ecmascript_2015">ES 2015のshorthand記法</a>を使って次のように記述することができます。
+<code class="language-plaintext highlighter-rouge">combineReducers({ counter, todos })</code>。これは<code class="language-plaintext highlighter-rouge">combineReducers({ counter: counter, todos: todos })</code>と等価です。</p>
+
+<h4 id="arguments">Arguments</h4>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">reducers</code> (<em>Object</em>): 複数のreducing functionを持つobjectです。reducing functionは<code class="language-plaintext highlighter-rouge">combineReducers()</code>によって1つにまとめられます。objectに格納されるreducing functionの注意点が以下にあります。</li>
+</ol>
+
+<h4 id="returns">Returns</h4>
+
+<p>(<em>Function</em>): 引数の<code class="language-plaintext highlighter-rouge">reducers</code> objectに格納されているすべてのreducerを実行するreducerで、<code class="language-plaintext highlighter-rouge">reducers</code> objectと同じ形状のstate objectを生成するreducer</p>
+
+<h4 id="注意点">注意点</h4>
+
+<p><code class="language-plaintext highlighter-rouge">combineReducers</code>に渡されるreducerは以下のルールを満たす必要があります。</p>
+
+<ul>
+  <li>
+    <p>reducerの対象外のactionの場合、reducerの第1引数のstateを返す必要があります。</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">undefined</code>を返してはいけません。単なる<code class="language-plaintext highlighter-rouge">return</code>文で間違えることはよくあることです。reducerが<code class="language-plaintext highlighter-rouge">undefined</code>を返した場合、errorをthrowします。</p>
+  </li>
+  <li>
+    <p>reducerの第1引数の<code class="language-plaintext highlighter-rouge">state</code>の値が<code class="language-plaintext highlighter-rouge">undefined</code>である場合、reducerはinital stateを返す必要があります。前述のルールに従うとinitial stateは<code class="language-plaintext highlighter-rouge">undefined</code>ではない必要があります。<a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Functions/Default_parameters">ES 2015のデフォルト引数</a>を使うことをお勧めしますが、明示的に第1引数が<code class="language-plaintext highlighter-rouge">undefined</code>か確認することもできます。</p>
+  </li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">combineReducers</code>はこれらのルールの一部に関して渡されたreducerが適合しているか確認しますが、これらを覚えて、それに従うようにしてください。<code class="language-plaintext highlighter-rouge">combineReducers</code>は渡されたreducerにundefinedを渡して確認します。これはinitial stateを<code class="language-plaintext highlighter-rouge">Redux.createStore(combineReducers(...), initialState)</code>のように指定した場合でも行われます。だから、必ず、意図せずreducerの第1引数のstateが<code class="language-plaintext highlighter-rouge">undefined</code>になった場合でも、正常に動作するようにreducerを実装してください。</p>
+
+<h4 id="example">Example</h4>
+
+<h4 id="reducerstodosjs"><code class="language-plaintext highlighter-rouge">reducers/todos.js</code></h4>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="kd">function</span> <span class="nx">todos</span><span class="p">(</span><span class="nx">state</span> <span class="o">=</span> <span class="p">[],</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">switch</span> <span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="dl">'</span><span class="s1">ADD_TODO</span><span class="dl">'</span><span class="p">:</span>
+      <span class="k">return</span> <span class="nx">state</span><span class="p">.</span><span class="nx">concat</span><span class="p">([</span><span class="nx">action</span><span class="p">.</span><span class="nx">text</span><span class="p">])</span>
+    <span class="k">default</span><span class="p">:</span>
+      <span class="k">return</span> <span class="nx">state</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="reducerscounterjs"><code class="language-plaintext highlighter-rouge">reducers/counter.js</code></h4>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="kd">function</span> <span class="nx">counter</span><span class="p">(</span><span class="nx">state</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">action</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">switch</span> <span class="p">(</span><span class="nx">action</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="dl">'</span><span class="s1">INCREMENT</span><span class="dl">'</span><span class="p">:</span>
+      <span class="k">return</span> <span class="nx">state</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">case</span> <span class="dl">'</span><span class="s1">DECREMENT</span><span class="dl">'</span><span class="p">:</span>
+      <span class="k">return</span> <span class="nx">state</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">default</span><span class="p">:</span>
+      <span class="k">return</span> <span class="nx">state</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="reducersindexjs"><code class="language-plaintext highlighter-rouge">reducers/index.js</code></h4>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">combineReducers</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">redux</span><span class="dl">'</span>
+<span class="k">import</span> <span class="nx">todos</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./todos</span><span class="dl">'</span>
+<span class="k">import</span> <span class="nx">counter</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./counter</span><span class="dl">'</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="nx">combineReducers</span><span class="p">({</span>
+  <span class="nx">todos</span><span class="p">,</span>
+  <span class="nx">counter</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h4 id="appjs"><code class="language-plaintext highlighter-rouge">App.js</code></h4>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">createStore</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">redux</span><span class="dl">'</span>
+<span class="k">import</span> <span class="nx">reducer</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./reducers/index</span><span class="dl">'</span>
+
+<span class="kd">const</span> <span class="nx">store</span> <span class="o">=</span> <span class="nx">createStore</span><span class="p">(</span><span class="nx">reducer</span><span class="p">)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">())</span>
+<span class="c1">// {</span>
+<span class="c1">//   counter: 0,</span>
+<span class="c1">//   todos: []</span>
+<span class="c1">// }</span>
+
+<span class="nx">store</span><span class="p">.</span><span class="nx">dispatch</span><span class="p">({</span>
+  <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">ADD_TODO</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">text</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Use Redux</span><span class="dl">'</span>
+<span class="p">})</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">store</span><span class="p">.</span><span class="nx">getState</span><span class="p">())</span>
+<span class="c1">// {</span>
+<span class="c1">//   counter: 0,</span>
+<span class="c1">//   todos: [ 'Use Redux' ]</span>
+<span class="c1">// }</span>
+</code></pre></div></div>
+
+<h2 id="license">License</h2>
+
+<h3 id="japanese-part">Japanese part</h3>
+
+<p>Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)</p>
+
+<p>Copyright (c) 2021 38elements</p>
+
+<h3 id="other">Other</h3>
+
+<p>The MIT License (MIT)</p>
+
+<p>Copyright (c) 2015-present Dan Abramov</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+    
+  </body>
+</html>

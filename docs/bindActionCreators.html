@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>bindActionCreators(actionCreators, dispatch) | redux</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="bindActionCreators(actionCreators, dispatch)" />
+<meta property="og:locale" content="ja" />
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/82270353?s=400&v=4" />
+<link rel="canonical" href="https://japanese-document.github.io/redux/bindActionCreators.html" />
+<meta property="og:url" content="https://japanese-document.github.io/redux/bindActionCreators.html" />
+<meta property="og:site_name" content="redux" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="bindActionCreators(actionCreators, dispatch)" />
+<script type="application/ld+json">
+{"headline":"bindActionCreators(actionCreators, dispatch)","url":"https://japanese-document.github.io/redux/bindActionCreators.html","@type":"WebPage","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/redux/assets/css/style.css?v=d288bf3357e8879206d8997fd37eb0e12bdf7545">
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      <h1 id="bindactioncreatorsactioncreators-dispatch">bindActionCreators(actionCreators, dispatch)</h1>
+
+<p><a href="https://japanese-document.github.io/redux/glossary.html#action-creator">action creator</a>を値として持つObjectを引数としてとります。そのObjectの値であるaction craetorをaction creatorを実行して戻り値(action)を<a href="https://redux.js.org/api/Store#dispatchaction"><code class="language-plaintext highlighter-rouge">dispatch</code></a>の引数として実行する関数(dispatch(actionCreator(args)))に置き換えます。(Objectのキーはそのまま)</p>
+
+<p>(actionを適用する場合、)通常、直接<a href="https://redux.js.org/api/Store"><code class="language-plaintext highlighter-rouge">Store</code></a>の<a href="https://redux.js.org/api/Store#dispatchaction"><code class="language-plaintext highlighter-rouge">dispatch</code></a>関数を実行する必要があります。ReduxをReactと連携させる場合、<a href="https://github.com/gaearon/react-redux">react-redux</a>が<code class="language-plaintext highlighter-rouge">dispatch</code>関数を提供するので、(dispatch関数を)直に実行することができます。</p>
+
+<p>唯一の<code class="language-plaintext highlighter-rouge">bindActionCreators</code>の使用例は<code class="language-plaintext highlighter-rouge">dispatch</code>やReduxのStoreをコンポーネントに渡すことなく、Reduxを意識せずコンポーネントにaction creatorを渡したい場合です。</p>
+
+<p>第1引数にaction creatorを渡すと、それをdispatchでラップした関数(dispatch(actionCreator(args)))を返します。</p>
+
+<h4 id="parameters">Parameters</h4>
+
+<ol>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">actionCreators</code> (<em>Function</em> or <em>Object</em>): action creatorもしくはaction creatorを値に持つObject</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">dispatch</code> (<em>Function</em>): <code class="language-plaintext highlighter-rouge">Store</code>の<a href="https://redux.js.org/api/Store#dispatchaction"><code class="language-plaintext highlighter-rouge">dispatch</code></a>関数</p>
+  </li>
+</ol>
+
+<h4 id="returns">Returns</h4>
+
+<p>(<em>Function</em> or <em>Object</em>): 第1引数にObjectが渡された場合、そのObjectの値をラップしてObjectの値の実行結果であるactionを第2引数のdispatchに渡して実行する関数(dispatch(actionCreator(args)))に置き換えて返します。第1引数に関数が渡された場合、同様に関数をラップして返します。</p>
+
+<h4 id="example">Example</h4>
+
+<h4 id="todoactioncreatorsjs"><code class="language-plaintext highlighter-rouge">TodoActionCreators.js</code></h4>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="kd">function</span> <span class="nx">addTodo</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">ADD_TODO</span><span class="dl">'</span><span class="p">,</span>
+    <span class="nx">text</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">export</span> <span class="kd">function</span> <span class="nx">removeTodo</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">type</span><span class="p">:</span> <span class="dl">'</span><span class="s1">REMOVE_TODO</span><span class="dl">'</span><span class="p">,</span>
+    <span class="nx">id</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="somecomponentjs"><code class="language-plaintext highlighter-rouge">SomeComponent.js</code></h4>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">react</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">bindActionCreators</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">redux</span><span class="dl">'</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">connect</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">react-redux</span><span class="dl">'</span>
+
+<span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">TodoActionCreators</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./TodoActionCreators</span><span class="dl">'</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">TodoActionCreators</span><span class="p">)</span>
+<span class="c1">// {</span>
+<span class="c1">//   addTodo: Function,</span>
+<span class="c1">//   removeTodo: Function</span>
+<span class="c1">// }</span>
+
+<span class="kd">class</span> <span class="nx">TodoListContainer</span> <span class="kd">extends</span> <span class="nx">Component</span> <span class="p">{</span>
+  <span class="kd">constructor</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">super</span><span class="p">(</span><span class="nx">props</span><span class="p">)</span>
+
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">dispatch</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">props</span>
+
+    <span class="c1">// 以下はbindActionCreatorsの使用例です。</span>
+    <span class="c1">// 子コンポーネントにReduxを完全に意識させたくない場合、action creatorをdispatchにbindして子コンポーネントに渡します。</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">boundActionCreators</span> <span class="o">=</span> <span class="nx">bindActionCreators</span><span class="p">(</span><span class="nx">TodoActionCreators</span><span class="p">,</span> <span class="nx">dispatch</span><span class="p">)</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">boundActionCreators</span><span class="p">)</span>
+    <span class="c1">// {</span>
+    <span class="c1">//   addTodo: Function,</span>
+    <span class="c1">//   removeTodo: Function</span>
+    <span class="c1">// }</span>
+  <span class="p">}</span>
+
+  <span class="nx">componentDidMount</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// react-reduxよる注入</span>
+    <span class="kd">let</span> <span class="p">{</span> <span class="nx">dispatch</span> <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span>
+
+    <span class="c1">// 注意: これは動作しません。</span>
+    <span class="c1">// TodoActionCreators.addTodo('Use Redux')</span>
+
+    <span class="c1">// 単にaction createrを実行しているだけです。</span>
+    <span class="c1">// actionをdispatchする必要があります。</span>
+
+    <span class="c1">// これは動作します。</span>
+    <span class="kd">let</span> <span class="nx">action</span> <span class="o">=</span> <span class="nx">TodoActionCreators</span><span class="p">.</span><span class="nx">addTodo</span><span class="p">(</span><span class="dl">'</span><span class="s1">Use Redux</span><span class="dl">'</span><span class="p">)</span>
+    <span class="nx">dispatch</span><span class="p">(</span><span class="nx">action</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// react-reduxよる注入</span>
+    <span class="kd">let</span> <span class="p">{</span> <span class="nx">todos</span> <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span>
+
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">TodoList</span> <span class="nx">todos</span><span class="o">=</span><span class="p">{</span><span class="nx">todos</span><span class="p">}</span> <span class="p">{...</span><span class="k">this</span><span class="p">.</span><span class="nx">boundActionCreators</span><span class="p">}</span> <span class="sr">/</span><span class="err">&gt;
+</span>
+    <span class="c1">// bindActionCreatorsを使う代わりにdispatch関数を子コンポーネントに渡す方法があります。</span>
+    <span class="c1">// しかし、子コンポーネントはaction creatorをimportして、それを意識する必要があります。</span>
+
+    <span class="c1">// return &lt;TodoList todos={todos} dispatch={dispatch} /&gt;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="nx">connect</span><span class="p">(</span><span class="nx">state</span> <span class="o">=&gt;</span> <span class="p">({</span> <span class="na">todos</span><span class="p">:</span> <span class="nx">state</span><span class="p">.</span><span class="nx">todos</span> <span class="p">}))(</span><span class="nx">TodoListContainer</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="license">License</h2>
+
+<h3 id="japanese-part">Japanese part</h3>
+
+<p>Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)</p>
+
+<p>Copyright (c) 2021 38elements</p>
+
+<h3 id="other">Other</h3>
+
+<p>The MIT License (MIT)</p>
+
+<p>Copyright (c) 2015-present Dan Abramov</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+    
+  </body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>用語 | redux</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="用語" />
+<meta property="og:locale" content="ja" />
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/82270353?s=400&v=4" />
+<link rel="canonical" href="https://japanese-document.github.io/redux/glossary.html" />
+<meta property="og:url" content="https://japanese-document.github.io/redux/glossary.html" />
+<meta property="og:site_name" content="redux" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="用語" />
+<script type="application/ld+json">
+{"headline":"用語","url":"https://japanese-document.github.io/redux/glossary.html","@type":"WebPage","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/redux/assets/css/style.css?v=d288bf3357e8879206d8997fd37eb0e12bdf7545">
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      <h1 id="用語">用語</h1>
+
+<p>ここではReduxでよく使われる用語をその型と併せて説明します。その型は<a href="https://flowtype.org/docs/quick-reference.html">Flowの表記</a>を使って説明します。</p>
+
+<h2 id="state">State</h2>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">type</span> <span class="nx">State</span> <span class="o">=</span> <span class="nx">any</span>
+</code></pre></div></div>
+
+<p><em>State</em> (別名 <em>state tree</em> )はいろいろな意味を持ちます。通常、Redux APIでは、Storeによって管理され、<a href="https://redux.js.org/api/store#getstate"><code class="language-plaintext highlighter-rouge">getState()</code></a>で返される単独の状態を意味します。 それはReduxを使ったアプリケーション全体の状態を表します。多くの場合、その状態は複雑なObjectです。</p>
+
+<p>慣習ではState自体はObjectやMapのようなkey-value collectionであることが多いですが、技術的には任意の型で問題ありません。それでも、Stateをシリアライズできるようにするべきです。簡単にJSONに変換できない物はStateの中に入れないようにしてください。</p>
+
+<h2 id="action">Action</h2>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">type</span> <span class="nx">Action</span> <span class="o">=</span> <span class="nb">Object</span>
+</code></pre></div></div>
+
+<p><em>Action</em> はStateを変更する注文を表す素のObjectです。ActionはデータをStoreに渡す唯一の方法です。つまり、UIイベントやネットワークコールバックやWebSocketのような他のソースからのデータは最終的にActionとしてdispatchする必要があります。</p>
+
+<p>Actionにそれの種類を示す<code class="language-plaintext highlighter-rouge">type</code>フィールドを設定する必要があります。<code class="language-plaintext highlighter-rouge">type</code>フィールドの値は定数として定義したり、他のモジュールからimportすることができます。<code class="language-plaintext highlighter-rouge">type</code>フィールドの値は<a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbols</a>より文字列の方が適しています。なぜなら、シリアライズできるからです。</p>
+
+<p><code class="language-plaintext highlighter-rouge">type</code>フィールド以外のActionオブジェクトの構造は特に決まっていません。それに興味がある場合は、<a href="https://github.com/acdlite/flux-standard-action">Flux Standard Action</a>が参考になると思います。</p>
+
+<p>以下の<a href="#async-action">Async Action</a>も見ましょう。</p>
+
+<h2 id="reducer">Reducer</h2>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">type</span> <span class="nx">Reducer</span><span class="o">&lt;</span><span class="nx">S</span><span class="p">,</span> <span class="nx">A</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">(</span><span class="nx">state</span><span class="p">:</span> <span class="nx">S</span><span class="p">,</span> <span class="nx">action</span><span class="p">:</span> <span class="nx">A</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">S</span>
+</code></pre></div></div>
+
+<p><em>reducer</em> (別名 <em>reducing function</em>) は累算結果と値を受け取って、新しい累算結果を返す関数です。 これはコレクションの値を1つの値に畳み込むために使われます。</p>
+
+<p>ReducerはReduxだけの概念ではありません。関数型プログラミングの基本的な概念です。JavaScriptのようなほとんど関数型言語でない言語でも、reduceするためのAPIを備えています。JavaScriptのそれは<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce"><code class="language-plaintext highlighter-rouge">Array.prototype.reduce()</code></a>です。</p>
+
+<p>Reduxでは累算結果はStateオブジェクトです。そして、累算される値はActionです。Reducerは既存のStateとActionを受け取って新しいStateを算出します。Reducerは <em>純粋関数(Pure Function)</em> である必要があります。つまり、同じ入力に対して完全に同じ出力を返す必要があります。</p>
+
+<p>hot reloadingやtime travelのような素晴らしい機能を動作させるために、Reducerは副作用(side-effects)を含んでいてはいけません。</p>
+
+<p>ReducerはReduxの最も重要なコンセプトです。</p>
+
+<p><em>API呼び出しをReducerに入れないでください。</em></p>
+
+<h2 id="dispatching-function">Dispatching Function</h2>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">type</span> <span class="nx">BaseDispatch</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">Action</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Action</span>
+<span class="nx">type</span> <span class="nx">Dispatch</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">Action</span> <span class="o">|</span> <span class="nx">AsyncAction</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">any</span>
+</code></pre></div></div>
+
+<p><em>Dispatching Function</em> (または、simply dispatch function )は、1つのActionもしくは1つの<a href="#async-action">Async Action</a>を受け取る関数です。この関数は1つのActionもStoreへdispatchしない場合と1つまたは複数のActionをStoreへdispatchする場合があります。</p>
+
+<p>一般的なDispatching FunctionとStoreインスタンスのMiddlewareを通さないBase <a href="https://redux.js.org/api/Store#dispatchaction"><code class="language-plaintext highlighter-rouge">Dispatch</code></a> Functionは異なります。</p>
+
+<p>Base Dispatch Functionは常に同期的なActionをStoreのReducerへ送ります。そのActionとReducerと既存のStoreのStateを使って、新しいStateを算出します。このActionは素のObjectにReducer用の値をセットした物です。</p>
+
+<p><a href="#middleware">Middleware</a>はBase Dispatch Functionをラップします。これによって、dispatch関数はActionに加えて<a href="#async-action">Async Action</a>を取り扱うことが可能になります。(Dispatching Functionになる。)MiddlewareはActionとAsync Actionを次のMiddlewareに渡す前に、それらを変換したり、遅延したり、無視したり、それ以外の処理を加える場合があります。詳しい説明は以下にあります。</p>
+
+<h2 id="action-creator">Action Creator</h2>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">type</span> <span class="nx">ActionCreator</span><span class="o">&lt;</span><span class="nx">A</span><span class="p">,</span> <span class="nx">P</span> <span class="kd">extends</span> <span class="nx">any</span><span class="p">[]</span> <span class="o">=</span> <span class="nx">any</span><span class="p">[]</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">args</span><span class="p">:</span> <span class="nx">P</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Action</span> <span class="o">|</span> <span class="nx">AsyncAction</span>
+</code></pre></div></div>
+
+<p><em>Action Creator</em> は端的に言うとActionを生成する関数です。もう一度言いますが、ActionはReducerへ送信されるデータ本体でAction CreaterはActionを生成する関数です。この2つを混同しないように注意してください。Action Creatorを実行するとActionが生成されるだけで、Actionはdispatchされません。Stateを変更したい場合は、Storeの <a href="https://redux.js.org/api/Store#dispatchaction"><code class="language-plaintext highlighter-rouge">dispatch</code></a>関数を実行する必要があります。Actionを生成して、それを特定のStoreインスタンスにdispatchするAction Creatorを <em>Bound Action Creator</em> と呼びます。</p>
+
+<p>Action Creatorが現在のStateを読み込んだり、APIを読み込んだり、RouterのTransitionのような副作用を発生させる必要がある場合は、Actionの代わりに<a href="#async-action">Async Action</a>を返す必要があります。</p>
+
+<h2 id="async-action">Async Action</h2>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">type</span> <span class="nx">AsyncAction</span> <span class="o">=</span> <span class="nx">any</span>
+</code></pre></div></div>
+
+<p><em>Async Action</em> はDispatching Functionに渡される値ですが、そのままではReducerで処理することができません。Async ActionはBase <a href="https://redux.js.org/api/Store#dispatchaction"><code class="language-plaintext highlighter-rouge">Dispatch</code></a> Functionに渡される前に、<a href="#middleware">Middleware</a>で1つまたは複数のActionに変換されます。Async Actionは適用するMiddlewareごとに型が異なります。たいてい、Async Actionは、Promiseやthunkのような非同期処理を実行するものです。Async ActionはReducerにそのまま渡されません。Middlewareで、それらの処理が完了した後、Actionがdispatchされます。</p>
+
+<h2 id="middleware">Middleware</h2>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">type</span> <span class="nx">MiddlewareAPI</span> <span class="o">=</span> <span class="p">{</span> <span class="na">dispatch</span><span class="p">:</span> <span class="nx">Dispatch</span><span class="p">,</span> <span class="na">getState</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">State</span> <span class="p">}</span>
+<span class="nx">type</span> <span class="nx">Middleware</span> <span class="o">=</span> <span class="p">(</span><span class="nx">api</span><span class="p">:</span> <span class="nx">MiddlewareAPI</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">next</span><span class="p">:</span> <span class="nx">Dispatch</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Dispatch</span>
+</code></pre></div></div>
+
+<p>MiddlewareはDispatching Functionを関数合成して新しい<a href="#dispatching-function">Dispatching Function</a>を返す高階関数(higher-order function)です。たいてい、それは <a href="#async-action">Async Action</a>をActionに変換します。</p>
+
+<p>Middlewareは関数合成(function composition)で生成されます。
+これはログを出力やRoutingのような副作用の実行や非同期のAPIの呼び出しに対応するMiddlewareを合成することで、それぞれを(非同期の)Actionに変換する1つのMiddlewareにすることを可能にします。詳しくは<a href="https://redux.js.org/api/applyMiddleware"><code class="language-plaintext highlighter-rouge">applyMiddleware(...middlewares)</code></a>を見てください。</p>
+
+<h2 id="store">Store</h2>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">type</span> <span class="nx">Store</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">dispatch</span><span class="p">:</span> <span class="nx">Dispatch</span>
+  <span class="na">getState</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">State</span>
+  <span class="na">subscribe</span><span class="p">:</span> <span class="p">(</span><span class="na">listener</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="k">void</span>
+  <span class="na">replaceReducer</span><span class="p">:</span> <span class="p">(</span><span class="na">reducer</span><span class="p">:</span> <span class="nx">Reducer</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">void</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Storeはアプリケーションのstate treeを保存するオブジェクトです。そのstate treeはReducerで構成されます。Reduxを使っているアプリケーションではStoreは1つのみ存在してるべきです。</p>
+
+<ul>
+  <li><a href="https://redux.js.org/api/Store#dispatchaction"><code class="language-plaintext highlighter-rouge">dispatch(action)</code></a>は上記のBase Dispatch Functionです。</li>
+  <li><a href="https://redux.js.org/api/Store#getState"><code class="language-plaintext highlighter-rouge">getState()</code></a>はStoreの現在のStateを返します。</li>
+  <li><a href="https://redux.js.org/api/Store#subscribelistener"><code class="language-plaintext highlighter-rouge">subscribe(listener)</code></a>Stateが変化したときに実行される関数を登録します。</li>
+  <li><a href="https://redux.js.org/api/Store#replacereducernextreducer"><code class="language-plaintext highlighter-rouge">replaceReducer(nextReducer)</code></a>はhot reloadingやcode splittingの実装に使うことができます。これを使うことはほとんどないと思います。</li>
+</ul>
+
+<p>詳しく知りたい場合は<a href="https://redux.js.org/api/store#dispatchaction">Store APIリファレンス</a>を見てください。</p>
+
+<h2 id="store-creator">Store Creator</h2>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">type</span> <span class="nx">StoreCreator</span> <span class="o">=</span> <span class="p">(</span><span class="nx">reducer</span><span class="p">:</span> <span class="nx">Reducer</span><span class="p">,</span> <span class="nx">preloadedState</span><span class="p">:</span> <span class="p">?</span><span class="nx">State</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Store</span>
+</code></pre></div></div>
+
+<p>Store CreatorはStoreを生成する関数です。Dispatching Functionのように、Base Store Creator(Reduxパッケージからexportされる<a href="https://redux.js.org/api/createStore"><code class="language-plaintext highlighter-rouge">createStore(reducer, preloadedState)</code></a>)とStore Enhancerで生成されるStore Creatorを区別する必要があります。</p>
+
+<h2 id="store-enhancer">Store Enhancer</h2>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">type</span> <span class="nx">StoreEnhancer</span> <span class="o">=</span> <span class="p">(</span><span class="nx">next</span><span class="p">:</span> <span class="nx">StoreCreator</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">StoreCreator</span>
+</code></pre></div></div>
+
+<p>Store EnhancerはStore Creatorを関数合成して新しい改良されたStore Creatorを返す高階関数です。これはStoreとのやり取りを関数合成で変更できることがMiddlewareと似ています。</p>
+
+<p>Store EnhancerはReactの<a href="https://reactjs.org/docs/higher-order-components.html">higher-order components</a>とほとんど同じコンセプトです。だから、“component enhancers”と呼ばれることもあります。</p>
+
+<p>Storeは(何らかのクラスの)インスタンスではなく関数を素のObjectにまとめたものなので、簡単に複製することができます。そして、元のStoreを変更することなく改善することができます。
+<a href="https://redux.js.org/api/compose"><code class="language-plaintext highlighter-rouge">compose</code></a>のドキュメントにこの例があります。</p>
+
+<p>たいてい、Store Enhancerを書くことはありませんが、<a href="https://github.com/reduxjs/redux-devtools">developer tools</a>で提供されているStore Enhancerを使うことはあるかもしれません。それはアプリケーションに影響を与えずにtime travelを可能にします。面白いことに、<a href="https://redux.js.org/api/applyMiddleware">Redux middlewareの実装</a>はそれ自体がStore Enhancerです。</p>
+
+<h2 id="license">License</h2>
+
+<h3 id="japanese-part">Japanese part</h3>
+
+<p>Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)</p>
+
+<p>Copyright (c) 2021 38elements</p>
+
+<h3 id="other">Other</h3>
+
+<p>The MIT License (MIT)</p>
+
+<p>Copyright (c) 2015-present Dan Abramov</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+    
+  </body>
+</html>
