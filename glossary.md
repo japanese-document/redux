@@ -10,7 +10,7 @@ type State = any
 
 _State_ (別名 _state tree_ )はいろいろな意味を持ちます。通常、Redux APIでは、Storeによって管理され、[`getState()`](https://redux.js.org/api/store#getstate)で返される単独の状態を意味します。 それはReduxを使ったアプリケーション全体の状態を表します。多くの場合、その状態は複雑なObjectです。
 
-慣習ではState自体はObjectやMapのようなkey-value collectionであることが多いですが、技術的には任意の型で問題ありません。それでも、Stateをシリアライズできるようにするべきです。簡単にJSONに変換できない物はStateの中に入れないようにしてください。
+State自体はObjectやMapのようなkey-value collectionであることが多いですが、技術的には任意の型で問題ありません。それでも、Stateをシリアライズできるようにするべきです。簡単にJSONに変換できない物はStateの中に入れないようにしてください。
 
 ## Action
 
