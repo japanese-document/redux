@@ -46,7 +46,7 @@
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p><code class="language-plaintext highlighter-rouge">combineReducers()</code>に渡すobjectのkey名を指定することで、stateのkey名を指定することができます。例として、<code class="language-plaintext highlighter-rouge">combineReducers({ todos: myTodosReducer, counter: myCounterReducer })</code>を実行した場合、stateを形状は<code class="language-plaintext highlighter-rouge">{ todos, counter }</code>になります。</p>
+<p><code class="language-plaintext highlighter-rouge">combineReducers()</code>に渡すobjectのkey名を指定することで、stateのkey名を指定することができます。例えば、<code class="language-plaintext highlighter-rouge">combineReducers({ todos: myTodosReducer, counter: myCounterReducer })</code>を実行した場合、stateを形状は<code class="language-plaintext highlighter-rouge">{ todos, counter }</code>になります。</p>
 
 <p>A popular convention is to name reducers after the state slices they manage, so you can use ES6 property shorthand notation:
 一般的に、reducerの関数名はそれが管理するstateの該当部分の名前にします。そうすると、<a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/Object_initializer#new_notations_in_ecmascript_2015">ES 2015のshorthand記法</a>を使って次のように記述することができます。
