@@ -21,7 +21,7 @@ rootReducer = combineReducers({potato: potatoReducer, tomato: tomatoReducer})
 }
 ```
 
-`combineReducers()`に渡すobjectのkey名を指定することで、stateのkey名を指定することができます。例として、`combineReducers({ todos: myTodosReducer, counter: myCounterReducer })`を実行した場合、stateを形状は`{ todos, counter }`になります。
+`combineReducers()`に渡すobjectのkey名を指定することで、stateのkey名を指定することができます。例えば、`combineReducers({ todos: myTodosReducer, counter: myCounterReducer })`を実行した場合、stateを形状は`{ todos, counter }`になります。
 
 A popular convention is to name reducers after the state slices they manage, so you can use ES6 property shorthand notation:
 一般的に、reducerの関数名はそれが管理するstateの該当部分の名前にします。そうすると、[ES 2015のshorthand記法](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/Object_initializer#new_notations_in_ecmascript_2015)を使って次のように記述することができます。
